@@ -4,7 +4,7 @@ The NGINX web server is configured as a reverse proxy that maps an application's
 
 Prequisites :
 
-1) S3 bucket to be created containing the autoscaler.yml file.
+1) S3 bucket to be created containing the **autoscaler.yml** [present inside the repo] file.
 2) Required permission to be given on IAM role to download the content of S3 bucket.
 3) VPC and subnets created prior to this deployment.
 4) DNA/Route 53 access to add the records.

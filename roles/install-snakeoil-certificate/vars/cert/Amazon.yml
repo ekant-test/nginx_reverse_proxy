@@ -1,0 +1,13 @@
+---
+# the folder where certificates are stored on the operating system
+cert_path: /etc/pki/tls/certs
+# the drop location for private ssl keys
+key_path: /etc/pki/tls/private
+
+# the target file extension for the cert files
+cert_ext: crt
+# the target file extension for the private key files
+key_ext: key
+
+# default name of the snakeoil certificates
+snakeoil_name: localhost

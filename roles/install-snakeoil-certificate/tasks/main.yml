@@ -1,0 +1,53 @@
+---
+# Include OS specific variables and define needed variables
+- include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+      - "{{ ansible_distribution }}.yml"
+      - "{{ ansible_os_family }}.yml"
+      - "{{ ansible_system }}.yml"
+      paths: vars/cert
+  tags: [ always, cert, ssl ]
+
+- name: Install OpenSSL
+  become: true
+  action:
+    module: "{{ ansible_pkg_mgr }}"
+    name: openssl
+    state: installed
+
+- name: Ensure Private Key Folder Exists
+  become: true
+  file:
+    path: "{{ key_path }}"
+    state: "directory"
+    mode: "{{ key_directory_permissions }}"
+    owner: "{{ cert_owner }}"
+    group: "{{ cert_group }}"
+  notify: "{{ callback }}"
+  tags: [ cert, ssl ]
+
+- name: Install Configured Certificates
+  include_tasks: mod/copy.yml
+  vars:
+    cert_name: "{{ certificate.name }}"
+    cert_file: "{{ certificate.cert_file }}"
+    private_key_file: "{{ certificate.private_key_file }}"
+  loop: "{{ certificates }}"
+  loop_control:
+    loop_var: certificate
+  when: not snakeoil_enabled
+  tags: [ cert, ssl ]
+
+- name: Install Snake Oil
+  include_tasks: mod/snakeoil.yml
+  vars:
+    cert_fqdn: "{{ snakeoil_fqdn if snakeoil_fqdn is defined else certificate.fqdn | default(ansible_fqdn) }}"
+    cert_name: "{{ certificate.name }}"
+    cert_file: "{{ certificate.cert_file | default( cert_path + '/' + certificate.name + '.' + cert_ext ) }}"
+    private_key_file: "{{ certificate.private_key_file | default( key_path + '/' + certificate.name + '.' + key_ext ) }}"
+  loop: "{{ _snakeoil_default if certificates | length == 0 else certificates }}" # default
+  loop_control:
+    loop_var: certificate
+  when: snakeoil_enabled
+  tags: [ cert, ssl ]

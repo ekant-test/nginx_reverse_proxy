@@ -1,0 +1,23 @@
+server {
+  server_name               {{ vhost.name }};
+
+  listen                    443 ssl http2;
+  ssl_certificate           {{ cert_path }}/localhost.crt;
+  ssl_certificate_key       {{ key_path }}/localhost.key;
+  ssl_session_cache         shared:SSL:1m;
+  ssl_session_timeout       10m;
+  ssl_protocols             {{ nginx_ssl_protocols | join(' ') }};
+  ssl_ciphers               {{ nginx_ssl_ciphers | join(':') }};
+  ssl_prefer_server_ciphers on;
+
+  resolver         {{ nginx_resolver }} valid=30s ipv6=off;
+  resolver_timeout 10s;
+
+  location / {
+    set $target_url {{ vhost.target }};
+    proxy_redirect off;
+    proxy_pass $target_url;
+    proxy_set_header Host $host;
+  }
+
+}

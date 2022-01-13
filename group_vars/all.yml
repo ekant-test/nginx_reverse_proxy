@@ -1,0 +1,4 @@
+---
+nginx_virtual_hosts:
+  - name: test.ekant.com
+    target: https://abc.ekant.com

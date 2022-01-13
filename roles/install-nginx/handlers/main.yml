@@ -1,0 +1,31 @@
+---
+- name: start nginx
+  become: true
+  service:
+    name: "{{ nginx_daemon }}"
+    state: started
+  when: nginx_enabled
+  tags: [ nginx ]
+
+- name: restart nginx
+  become: true
+  service:
+    name: "{{ nginx_daemon }}"
+    state: restarted
+  when: nginx_enabled
+  tags: [ nginx ]
+
+- name: reload nginx
+  become: true
+  service:
+    name: "{{ nginx_daemon }}"
+    state: reloaded
+  when: nginx_enabled
+  tags: [ nginx ]
+
+- name: stop nginx
+  become: true
+  service:
+    name: "{{ nginx_daemon }}"
+    state: stopped
+  tags: [ nginx ]

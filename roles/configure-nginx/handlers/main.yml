@@ -1,0 +1,6 @@
+---
+- name: save iptables
+  become: true
+  shell: iptables-save > /etc/sysconfig/iptables
+  changed_when: false
+  tags: [ nginx ]

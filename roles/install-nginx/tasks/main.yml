@@ -1,0 +1,31 @@
+---
+- name: Load Distribution Variables
+  include_vars: "{{ variable_file }}"
+  with_first_found:
+    - files:
+       - "{{ ansible_distribution }}.yml"
+       - "{{ ansible_os_family }}.yml"
+       - "{{ ansible_system }}.yml"
+      paths: vars/nginx
+  loop_control:
+    loop_var: variable_file
+  tags: [ always, nginx ]
+
+- name: Install Nginx
+  include_tasks: "{{ install_file }}"
+  with_first_found:
+    - "02-install-{{ ansible_distribution }}.yml"
+    - "02-install-{{ ansible_os_family }}.yml"
+    - "02-install-{{ ansible_system }}.yml"
+    - "99-not-supported.yml"
+  loop_control:
+    loop_var: install_file
+  tags: [ always, nginx ]
+
+- name: Enable Nginx
+  become: true
+  service:
+    name: "{{ nginx_daemon }}"
+    enabled: "{{ nginx_enabled }}"
+  when: ansible_virtualization_type != 'docker'
+  tags: [ nginx ]

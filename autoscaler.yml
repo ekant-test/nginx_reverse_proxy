@@ -1,0 +1,6 @@
+---
+- name: Provision Server
+  hosts: autoscaler
+  roles:
+    - install-nginx
+    - configure-nginx

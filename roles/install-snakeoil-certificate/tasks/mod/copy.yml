@@ -1,0 +1,22 @@
+---
+- name: "Install SSL Certificate {{ cert_name }}"
+  become: true
+  copy:
+    content: "{{ lookup('file', cert_file | default(cert_name + '.crt')) }}\n"
+    dest: "{{ cert_path }}/{{ cert_name }}.{{ cert_ext }}"
+    owner: "{{ cert_owner }}"
+    group: "{{ cert_group }}"
+    mode: '0644'
+  when: cert_name is defined and cert_name is not none
+  notify: "{{ callback }}"
+
+- name: "Install SSL Private Key {{ cert_name }}"
+  become: true
+  copy:
+    content: "{{ lookup('file', private_key_file) }}\n"
+    dest: "{{ key_path }}/{{ cert_name }}.{{ key_ext }}"
+    owner: "{{ cert_owner }}"
+    group: "{{ cert_group }}"
+    mode: '0600'
+  when: private_key_file is defined and private_key_file is not none
+  notify: "{{ callback }}"

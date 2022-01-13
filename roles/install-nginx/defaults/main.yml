@@ -1,0 +1,9 @@
+---
+# ensure the service in enabled
+nginx_enabled: true
+
+# enable to install from amazon linux extras channel
+nginx_amazon_extras_enabled: true
+
+# the name of the amazon linux extras channel to install nginx from
+nginx_amazon_extras_channel: nginx1

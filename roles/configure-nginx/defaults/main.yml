@@ -1,0 +1,18 @@
+---
+# allowed SSL protocols and ciphers
+nginx_ssl_protocols:
+  - TLSv1.1
+  - TLSv1.2
+
+nginx_ssl_ciphers:
+  - ECDHE-ECDSA-CHACHA20-POLY1305
+  - ECDH+AESGCM
+  - DH+AESGCM
+  - ECDH+AES256
+  - DH+AES256
+  - ECDH+AES128
+  - DH+AES
+  - '!AES256-GCM-SHA256'
+  - '!AES256-GCM-SHA128'
+  - '!aNULL'
+  - '!MD5'

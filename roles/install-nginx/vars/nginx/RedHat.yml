@@ -1,0 +1,21 @@
+---
+# name of the default daemon
+nginx_daemon: nginx
+
+# the nginx home directory on the operating system
+nginx_home: /etc/nginx
+
+# module library path where to install nginx modules
+nginx_lib_home: /usr/lib64/nginx/modules
+
+# The location of the main configuration file
+nginx_conf_file: "{{ nginx_home }}/nginx.conf"
+
+# configuration includes directive
+nginx_conf_includes: "{{ nginx_home }}/conf.d"
+
+# the default log location where nginx is dumping the log files
+nginx_logs: /var/log/nginx
+
+# location of the nginx serice pid file
+nginx_pid_file: /var/run/nginx.pid

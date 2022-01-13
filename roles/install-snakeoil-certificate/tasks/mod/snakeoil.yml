@@ -1,0 +1,93 @@
+---
+- name: "Check Snake Oil Certificate {{ cert_name }}"
+  become: true
+  stat:
+    path: "{{ cert_file }}"
+  register: snakeoil_cert_check
+
+- name: "Check Snake Oil Key {{ cert_name }}"
+  become: true
+  stat:
+    path: "{{ private_key_file }}"
+  register: snakeoil_key_check
+
+- name: Set Snake Oil Present
+  set_fact:
+    cert_snakeoil_present: "{{ snakeoil_cert_check.stat.exists | bool and snakeoil_key_check.stat.exists | bool }}"
+
+- block:
+  - name: Create OpenSSL Configuration File
+    become: true
+    tempfile:
+      state: file
+      suffix: '.openssl.conf'
+    register: openssl_config_file
+    changed_when: false
+
+  - name: Configure OpenSSL
+    become: true
+    copy:
+      content: |
+        [req]
+        default_bits = {{ snakeoil_bits }}
+        prompt = no
+        req_extensions = req_ext
+        distinguished_name = dn
+        [ dn ]
+        CN = {{ cert_fqdn }}
+        [ req_ext ]
+        keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+        subjectAltName = @alt_names
+        extendedKeyUsage = serverAuth, clientAuth
+        nsCertType = server
+        [alt_names]
+        DNS.1 = {{ cert_fqdn }}
+      dest: "{{ openssl_config_file.path }}"
+      backup: false
+      mode: '0644'
+    changed_when: false
+
+  - name: Generate Snake Oil Certificates
+    become: true
+    shell: |
+      openssl req -newkey rsa:{{ snakeoil_bits }} \
+                  -nodes \
+                  -x509 -days 3650 \
+                  -out "{{ cert_file }}" \
+                  -keyout "{{ private_key_file }}" \
+                  -subj '/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN={{ cert_fqdn }}/emailAddress=root@{{ cert_fqdn }}' \
+                  -config {{ openssl_config_file.path }}
+    args:
+      executable: /bin/bash
+    register: cert_snakeoil_result
+    changed_when: cert_snakeoil_result['stderr'] is search('^Generating')
+    notify: "{{ callback }}"
+
+  - name: "Protect Cert File {{ cert_name }}"
+    become: true
+    file:
+      path: "{{ cert_file }}"
+      owner: "{{ cert_owner }}"
+      group: "{{ cert_group }}"
+      mode: '0640'
+    notify: "{{ callback }}"
+
+  - name: "Protect Private Key {{ cert_name }}"
+    become: true
+    file:
+      path: "{{ private_key_file }}"
+      owner: "{{ cert_owner }}"
+      group: "{{ cert_group }}"
+      mode: '0600'
+    notify: "{{ callback }}"
+
+  always:
+    - name: Remove OpenSSL Configuration
+      become: true
+      file:
+        path: "{{ openssl_config_file.path }}"
+        state: absent
+      changed_when: false
+      when: openssl_config_file is defined
+
+  when: not cert_snakeoil_present

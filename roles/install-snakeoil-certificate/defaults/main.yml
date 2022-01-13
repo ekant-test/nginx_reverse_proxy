@@ -1,0 +1,26 @@
+---
+# start with an empty list of certificates
+certificates: []
+# owner of the cert file and optional key
+cert_owner: root
+# owner group of the cert file and optional key
+cert_group: root
+
+# the default permissions of the private key folder
+key_directory_permissions: '0750'
+
+# if desired, the callback hander to use
+callback: No-Op Certificates Updated
+
+# enable snakeoil certs
+snakeoil_enabled: false
+
+# the number of bits for the snakeoil key
+snakeoil_bits: 2048
+
+# the default configuration for snakeoil certificates
+_snakeoil_default:
+  - name: "{{ snakeoil_name }}"
+    cert_file: "{{ cert_path }}/{{ snakeoil_name }}.{{ cert_ext }}"
+    private_key_file: "{{ key_path }}/{{ snakeoil_name }}.{{ key_ext }}"
+    fqdn: "{{ ansible_fqdn }}"

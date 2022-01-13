@@ -1,0 +1,51 @@
+---
+- name: Install Snakeoil Certificates
+  include_role:
+    name: install-snakeoil-certificate
+    apply:
+      tags: [ nginx, conf ]
+  vars:
+    snakeoil_enabled: true
+    snakeoil_fqdn: localhost
+    callback: restart nginx
+  tags: [ nginx ]
+
+- name: Configure Nginx
+  become: true
+  template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_home }}/nginx.conf"
+    mode: '0644'
+  notify: restart nginx
+  tags:  [ nginx ]
+
+- name: "Configure Virtual Host {{ vhost.name }}"
+  become: true
+  template:
+    src: vhost.conf.j2
+    dest: "{{ nginx_conf_includes }}/{{ vhost.name }}.conf"
+    mode: '0640'
+  with_items: "{{ nginx_virtual_hosts }}"
+  loop_control:
+    loop_var: vhost
+  notify: restart nginx
+  tags:  [ nginx ]
+
+- name: Enable Nginx Service
+  become: true
+  service:
+    name: "{{ nginx_daemon }}"
+    enabled: "{{ nginx_enabled }}"
+  tags: [ nginx ]
+
+- name: Allow HTTPS Ingress
+  become: true
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: '443'
+    ctstate: NEW
+    jump: ACCEPT
+    comment: accept https connections
+  notify: save iptables
+  tags: [ nginx ]

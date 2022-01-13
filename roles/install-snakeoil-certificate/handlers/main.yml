@@ -1,0 +1,3 @@
+---
+- name: No-Op Certificates Updated
+  debug: msg="certificate have been updated"

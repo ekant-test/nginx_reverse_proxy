@@ -1,0 +1,3 @@
+---
+- fail: msg="Installing Nginx on {{ ansible_os_family }} is not supported by this installer"
+  tags: [ nginx ]

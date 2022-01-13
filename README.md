@@ -22,7 +22,7 @@ We need to add DNS records manually to the DNS zone. To complete configuration o
 test.ekant.com CNAME your-publicdns-name-of-oadbalancer.ap-southeast-2.elb.amazonaws.com.
 
 
-Configure AKAMAI to route https://test.ekant.com requests to https://abc.ekant.com keeping the original host header intact.
+Configure DNS to route https://test.ekant.com requests to https://abc.ekant.com keeping the original host header intact.
 
 
 Confirm the https://abc.ekant.com endpoint is available.

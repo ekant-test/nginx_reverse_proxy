@@ -9,6 +9,11 @@ Prequisites :
 3) VPC and subnets created prior to this deployment.
 4) DNA/Route 53 access to add the records.
 
+USAGES:
+
+terraform init
+terraform apply
+
 The application DNS to target URL mapping is configured in group_vars/[env].yml. The mapping is called nginx_virtual_hosts and contains a simple hash of name and target attributes.
 To release a change to the autoscaler you must:
 
